@@ -1,135 +1,126 @@
 window.onload = letsbegin;
-var allMarksNode = [];
-var allMarksUrlNode = [];
-var duplink = 0;
+var allMarks = [];
+var dupNum = 0;
 
 function letsbegin() {
-    console.log("begin");
+    console.log("begin build bookmarks tree");
+    document.getElementById('folder0').innerHTML = '';
     chrome.bookmarks.getTree(function (marks) {
         getMarks(marks[0]);
     })
-    console.log("end");
-    document.getElementById('finddup').onclick = findDup;
-    document.getElementById('dup').onclick = delMark;
+    console.log("end build bookmarks tree");
+    document.getElementById('finddupmarkbtn').onclick = findDupMarks;
+    document.getElementById('dupmarkdiv').onclick = delAMark;
 }
 
-function getMarks(root) {
-    for (var i = 0; i < root.children.length; i++) {
-        if (root.children[i].url == null) {
+function getMarks(node) {
+    for (var i = 0; i < node.children.length; i++) {
+        if (node.children[i].url == null) {
             //console.log("add a folder");
-            //console.log(root.children[i]);
-            addFolder(root.children[i]);
-            getMarks(root.children[i]);
+            addFolder(node.children[i]);
+            getMarks(node.children[i]);
         } else {
             //console.log("add a mark");
-            //console.log(root.children[i]);
-            addAMark(root.children[i]);
+            addAMark(node.children[i]);
         }
     }
 }
 
-function addFolder(f) {
-    var fnode = document.createElement('div');
-    fnode.setAttribute('class', 'folder');
-    fnode.setAttribute('id', 'folder' + f.id);
-    fnode.textContent = f.title;
-    document.getElementById('folder' + f.parentId).appendChild(fnode);
-    //console.log(f.title);
+function addFolder(afolder) {
+    var divfolder = document.createElement('div');
+    divfolder.className = 'folder';
+    divfolder.id = 'folder' + afolder.id;
+    divfolder.textContent = afolder.title;
+    document.getElementById('folder' + afolder.parentId).appendChild(divfolder);
 }
 
-function addAMark(m) {
-    allMarksUrlNode.push(m);
-    //console.log(m.title + "--->" + m.url);
-    var mnode = document.createElement('div');
-    mnode.setAttribute('class', 'mark');
-    mnode.setAttribute('id', 'mark' + m.id);
-    var mnodedt = document.createElement('dt');
-    var mnodea = document.createElement('a');
-    mnodea.setAttribute('href', m.url);
-    mnodea.textContent = m.title;
-    mnodedt.appendChild(mnodea);
-    var mnodedd = document.createElement('dd');
-    mnodedd.textContent = m.url;
-    mnode.appendChild(mnodedt);
-    mnode.appendChild(mnodedd);
-    document.getElementById('folder' + m.parentId).appendChild(mnode);
+function addAMark(amark) {
+    allMarks.push(amark);
+    var divmark = document.createElement('div');
+    divmark.className = 'mark';
+    divmark.id = 'mark' + amark.id;
+    var dtmark = document.createElement('dt');
+    var hrefmark = document.createElement('a');
+    hrefmark.href = amark.url;
+    hrefmark.textContent = amark.title;
+    dtmark.appendChild(hrefmark);
+    var ddmark = document.createElement('dd');
+    ddmark.textContent = amark.url;
+    divmark.appendChild(dtmark);
+    divmark.appendChild(ddmark);
+    document.getElementById('folder' + amark.parentId).appendChild(divmark);
 }
 
-function findDup() {
+function findDupMarks() {
     console.log("begin find dup");
-    duplink = 0;
-    //console.log(allMarksUrlNode);
-    document.getElementById('dup').innerHTML = '';
-    for (var i = 0; i < allMarksUrlNode.length; i++) {
-        findD(allMarksUrlNode[i], i);
+    dupNum = 0;
+    //console.log(allMarks);
+    document.getElementById('dupmarkdiv').innerHTML = '';
+    for (var i = 0; i < allMarks.length; i++) {
+        compareMarks(allMarks[i], i);
     }
     console.log("end find dup");
-    if (duplink == 0) {
-        document.getElementById('dup').innerHTML += 'No duplinks';
-    } else {
-        document.getElementById('dup').innerHTML += duplink + ' duplinks';
-    }
+    document.getElementById('dupmarkdiv').innerHTML += dupNum + ' dupNums';
 }
 
-function findD(urlnode, index) {
-    //console.log("find" + urlnode.id + ' ' + urlnode.url); 
-    for (var i = index + 1; i < allMarksUrlNode.length; i++) {
+function compareMarks(amark, index) {
+    for (var i = index + 1; i < allMarks.length; i++) {
         var urlsame = false;
         var titlesame = false;
-        if (urlnode.url.toLowerCase().replace(/\s/g, "").replace(/https*:\/\//g, "") ==
-            allMarksUrlNode[i].url.toLowerCase().replace(/\s/g, "").replace(/https*:\/\//g, "")) {
+        if (amark.url.toLowerCase().replace(/\s/g, "").replace(/https*:\/\//g, "") ==
+            allMarks[i].url.toLowerCase().replace(/\s/g, "").replace(/https*:\/\//g, "")) {
             urlsame = true;
-            duplink++;
-            document.getElementById('dup').innerHTML += 'url same ';
+            dupNum++;
+            document.getElementById('dupmarkdiv').innerHTML += 'Url ';
         }
-        if (urlnode.title.toLowerCase().replace(/\s/g, "") ==
-            allMarksUrlNode[i].title.toLowerCase().replace(/\s/g, "")) {
+        if (amark.title.toLowerCase().replace(/\s/g, "") ==
+            allMarks[i].title.toLowerCase().replace(/\s/g, "")) {
             titlesame = true;
-            duplink++;
-            document.getElementById('dup').innerHTML += 'title same ';
+            dupNum++;
+            document.getElementById('dupmarkdiv').innerHTML += 'Title ';
         }
         if (urlsame || titlesame) {
+            document.getElementById('dupmarkdiv').innerHTML += 'same: ';
             var node1 = document.createElement('div');
+            node1.className = 'dupgroup1';
             var delbtn1 = document.createElement('input');
             delbtn1.type = 'button';
-            delbtn1.id = 'delete' + urlnode.id;
-            delbtn1.value = 'delete mark: ' + urlnode.id;
-            var dup1 = document.createElement('div');
+            delbtn1.id = 'delete' + amark.id;
+            delbtn1.value = 'delete';
+            var dup1 = document.createElement('span');
             dup1.className = 'dup1';
-            dup1.id = 'url' + urlnode.id;
-            dup1.textContent = urlnode.title + ' -- > ' + urlnode.url;
+            dup1.id = 'url' + amark.id;
+            dup1.textContent = amark.id + ' ' + amark.title + ' ' + amark.url;
             node1.appendChild(delbtn1);
             node1.appendChild(dup1);
 
             var node2 = document.createElement('div');
+            node2.className = 'dupgroup2';
             var delbtn2 = document.createElement('input');
             delbtn2.type = 'button';
-            delbtn2.id = 'delete' + allMarksUrlNode[i].id;
-            delbtn2.value = 'delete mark: ' + allMarksUrlNode[i].id;
-            var dup2 = document.createElement('div');
+            delbtn2.id = 'delete' + allMarks[i].id;
+            delbtn2.value = 'delete';
+            var dup2 = document.createElement('span');
             dup2.className = 'dup2';
-            dup2.id = 'url' + allMarksUrlNode[i].id;
-            dup2.textContent = allMarksUrlNode[i].title + ' -- > ' + allMarksUrlNode[i].url;
+            dup2.id = 'url' + allMarks[i].id;
+            dup2.textContent = allMarks[i].id + ' ' + allMarks[i].title + ' ' + allMarks[i].url;
             node2.appendChild(delbtn2);
             node2.appendChild(dup2);
 
-            document.getElementById('dup').appendChild(node1);
-            document.getElementById('dup').appendChild(node2);
+            document.getElementById('dupmarkdiv').appendChild(node1);
+            document.getElementById('dupmarkdiv').appendChild(node2);
         }
     }
 }
 
-function delMark() {
+function delAMark() {
     //console.log(event.target.id);
     if (event.target.id.match(/delete\d+/)) {
         var removeid = event.target.id.match(/\d+/);
         chrome.bookmarks.remove(removeid[0]);
         alert(removeid);
-        //allMarksNode = [];
-        //allMarksUrlNode = [];
-        //letsbegin();
+        allMarks = [];
         location.reload(true);
-        findDup();
     }
 
 }
