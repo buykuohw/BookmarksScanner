@@ -89,14 +89,11 @@ function findD(urlnode, index) {
             document.getElementById('dup').innerHTML += 'title same ';
         }
         if (urlsame || titlesame) {
-            //duplink--;
             var node1 = document.createElement('div');
             var delbtn1 = document.createElement('input');
             delbtn1.type = 'button';
             delbtn1.id = 'delete' + urlnode.id;
             delbtn1.value = 'delete mark: ' + urlnode.id;
-            //delbtn1.onclick = delMark(urlnode);
-            //(function(i){delbtn1.onclick=delMark(i)})(urlnode);
             var dup1 = document.createElement('div');
             dup1.className = 'dup1';
             dup1.id = 'url' + urlnode.id;
@@ -109,7 +106,6 @@ function findD(urlnode, index) {
             delbtn2.type = 'button';
             delbtn2.id = 'delete' + allMarksUrlNode[i].id;
             delbtn2.value = 'delete mark: ' + allMarksUrlNode[i].id;
-            //delbtn2.onclick = delMark(urlnode);
             var dup2 = document.createElement('div');
             dup2.className = 'dup2';
             dup2.id = 'url' + allMarksUrlNode[i].id;
