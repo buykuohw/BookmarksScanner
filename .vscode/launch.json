@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "type": "chrome",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/mybookmarketscanner\\js\\scanner.js"
+            "file": "${workspaceFolder}/bookmarksmod.html"
         }
     ]
 }
